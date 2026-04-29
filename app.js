@@ -18,9 +18,9 @@
   function loadSettings() {
     const defaults = {
       endpointUrl: DEFAULT_ENDPOINT,
-      defaultEvent: '',
+      defaultEvent: 'FTCCMP1',
       autoSync: true,
-      autoIncrement: true,
+      autoIncrement: false,
     };
     try {
       const raw = localStorage.getItem(SETTINGS_KEY);
