@@ -16,11 +16,16 @@
     <div class="status">
       <span id="netStatus" class="pill pill-net">offline</span>
       <span id="unsyncedCount" class="pill pill-count">0 unsynced</span>
+      <button id="entriesBtn" class="icon-btn" aria-label="Entries">☰</button>
       <button id="settingsBtn" class="icon-btn" aria-label="Settings">⚙︎</button>
     </div>
   </header>
 
   <main class="container">
+    <div id="editBanner" class="edit-banner" hidden>
+      <span>Editing <strong class="edit-target">—</strong></span>
+      <button id="cancelEditBtn" class="link-btn">Cancel</button>
+    </div>
     <section class="card">
       <div class="row">
         <label class="field">
@@ -103,6 +108,18 @@
       <button id="syncBtn" class="secondary">Sync</button>
     </section>
   </main>
+
+  <div id="entriesScreen" class="modal modal-full" hidden>
+    <div class="modal-card modal-card-full">
+      <header class="modal-header">
+        <button id="entriesClose" class="icon-btn" aria-label="Close">✕</button>
+        <h2>Entries</h2>
+      </header>
+      <div id="entriesList" class="entries-list">
+        <div class="entries-empty">Loading…</div>
+      </div>
+    </div>
+  </div>
 
   <div id="settingsDialog" class="modal" hidden>
     <div class="modal-card">
