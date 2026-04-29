@@ -117,6 +117,25 @@ input, textarea {
 }
 .field input:focus, .field textarea:focus { border-color: var(--primary); }
 
+.event-banner {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.event-banner strong { color: var(--text); font-weight: 700; letter-spacing: 0.5px; }
+.link-btn {
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+
 .alliance-toggle {
   margin-top: 12px;
   display: grid;

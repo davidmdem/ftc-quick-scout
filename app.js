@@ -6,6 +6,7 @@
 
   const SETTINGS_KEY = 'ftc-scouting:settings';
   const DEVICE_ID_KEY = 'ftc-scouting:deviceId';
+  const SCOUT_NAME_KEY = 'ftc-scouting:scoutName';
 
   // Paste the Apps Script /exec URL here once and commit. All tablets that
   // load the hosted app will pick it up automatically. Per-tablet Settings
@@ -43,6 +44,13 @@
       localStorage.setItem(DEVICE_ID_KEY, id);
     }
     return id;
+  }
+  function getScoutName() {
+    return localStorage.getItem(SCOUT_NAME_KEY) || '';
+  }
+  function setScoutName(name) {
+    if (name) localStorage.setItem(SCOUT_NAME_KEY, name);
+    else localStorage.removeItem(SCOUT_NAME_KEY);
   }
 
   // ---------- IndexedDB ----------
@@ -174,7 +182,7 @@
 
   // ---------- UI state ----------
   const state = {
-    eventCode: '',
+    scoutName: '',
     matchNumber: '',
     teamNumber: '',
     alliance: null,
@@ -201,10 +209,14 @@
     });
   }
   function renderInputs() {
-    $('#eventCode').value = state.eventCode;
+    $('#scoutName').value = state.scoutName;
     $('#matchNumber').value = state.matchNumber;
     $('#teamNumber').value = state.teamNumber;
     $('#notes').value = state.notes;
+  }
+  function renderEventLabel() {
+    const s = loadSettings();
+    $('#eventLabel').textContent = s.defaultEvent || '(set in settings)';
   }
 
   function bindCounters() {
@@ -229,7 +241,10 @@
     });
   }
   function bindInputs() {
-    $('#eventCode').addEventListener('input', (e) => state.eventCode = e.target.value.trim());
+    $('#scoutName').addEventListener('input', (e) => {
+      state.scoutName = e.target.value;
+      setScoutName(state.scoutName.trim());
+    });
     $('#matchNumber').addEventListener('input', (e) => state.matchNumber = e.target.value);
     $('#teamNumber').addEventListener('input', (e) => state.teamNumber = e.target.value);
     $('#notes').addEventListener('input', (e) => state.notes = e.target.value);
@@ -249,7 +264,9 @@
   }
 
   function validate() {
-    if (!state.eventCode) return 'Enter event code';
+    const settings = loadSettings();
+    if (!settings.defaultEvent) return 'Set event in Settings';
+    if (!state.scoutName.trim()) return 'Enter scout name';
     const m = parseInt(state.matchNumber, 10);
     if (!Number.isFinite(m) || m <= 0) return 'Enter match number';
     const t = parseInt(state.teamNumber, 10);
@@ -259,11 +276,13 @@
   }
 
   function buildEntry() {
+    const settings = loadSettings();
     return {
       id: (crypto.randomUUID && crypto.randomUUID()) || `entry-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       timestamp: new Date().toISOString(),
       deviceId: getDeviceId(),
-      eventCode: state.eventCode,
+      scoutName: state.scoutName.trim(),
+      eventCode: settings.defaultEvent,
       matchNumber: parseInt(state.matchNumber, 10),
       alliance: state.alliance,
       teamNumber: parseInt(state.teamNumber, 10),
@@ -349,10 +368,7 @@
     saveSettings(s);
     const newDev = $('#deviceIdInput').value.trim();
     if (newDev) localStorage.setItem(DEVICE_ID_KEY, newDev);
-    if (!state.eventCode && s.defaultEvent) {
-      state.eventCode = s.defaultEvent;
-      renderInputs();
-    }
+    renderEventLabel();
     closeSettings();
     toast('Settings saved', 'success');
   }
@@ -366,6 +382,7 @@
     $('#saveBtn').addEventListener('click', onSave);
     $('#syncBtn').addEventListener('click', () => syncAll({ silent: false }));
     $('#settingsBtn').addEventListener('click', openSettings);
+    $('#eventSettingsBtn').addEventListener('click', openSettings);
     $('#settingsCancel').addEventListener('click', closeSettings);
     $('#settingsSave').addEventListener('click', saveSettingsFromDialog);
 
@@ -377,8 +394,9 @@
     window.addEventListener('offline', renderNetStatus);
 
     const settings = loadSettings();
-    state.eventCode = settings.defaultEvent || '';
+    state.scoutName = getScoutName();
     renderInputs();
+    renderEventLabel();
     renderCounters();
     renderAlliance();
     renderNetStatus();

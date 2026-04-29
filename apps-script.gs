@@ -29,6 +29,7 @@ const SHEET_NAME = 'RawData';
 const HEADERS = [
   'timestamp',
   'deviceId',
+  'scoutName',
   'eventCode',
   'matchNumber',
   'alliance',
@@ -69,6 +70,7 @@ function doPost(e) {
     sheet.appendRow([
       data.timestamp || new Date().toISOString(),
       data.deviceId || '',
+      data.scoutName || '',
       data.eventCode || '',
       data.matchNumber,
       data.alliance || '',

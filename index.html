@@ -24,8 +24,8 @@
     <section class="card">
       <div class="row">
         <label class="field">
-          <span>Event</span>
-          <input id="eventCode" type="text" inputmode="text" autocomplete="off" placeholder="e.g. USCAFC" />
+          <span>Scout</span>
+          <input id="scoutName" type="text" inputmode="text" autocomplete="off" autocapitalize="words" placeholder="Your name" />
         </label>
         <label class="field">
           <span>Match #</span>
@@ -35,6 +35,10 @@
           <span>Team #</span>
           <input id="teamNumber" type="number" inputmode="numeric" min="1" step="1" />
         </label>
+      </div>
+      <div class="event-banner">
+        Event: <strong id="eventLabel">—</strong>
+        <button type="button" id="eventSettingsBtn" class="link-btn">change</button>
       </div>
 
       <div class="alliance-toggle" role="radiogroup" aria-label="Alliance">
