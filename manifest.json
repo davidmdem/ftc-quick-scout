@@ -1,0 +1,19 @@
+{
+  "name": "FTC Scouting",
+  "short_name": "Scouting",
+  "description": "Offline-first FTC match scouting tablet app.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

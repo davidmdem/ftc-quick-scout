@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>FTC Scouting</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon.svg" />
+  <link rel="apple-touch-icon" href="icons/icon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">FTC Scouting</div>
+    <div class="status">
+      <span id="netStatus" class="pill pill-net">offline</span>
+      <span id="unsyncedCount" class="pill pill-count">0 unsynced</span>
+      <button id="settingsBtn" class="icon-btn" aria-label="Settings">⚙︎</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div class="row">
+        <label class="field">
+          <span>Event</span>
+          <input id="eventCode" type="text" inputmode="text" autocomplete="off" placeholder="e.g. USCAFC" />
+        </label>
+        <label class="field">
+          <span>Match #</span>
+          <input id="matchNumber" type="number" inputmode="numeric" min="1" step="1" />
+        </label>
+        <label class="field">
+          <span>Team #</span>
+          <input id="teamNumber" type="number" inputmode="numeric" min="1" step="1" />
+        </label>
+      </div>
+
+      <div class="alliance-toggle" role="radiogroup" aria-label="Alliance">
+        <button type="button" class="alliance red" data-alliance="red" role="radio" aria-checked="false">Red</button>
+        <button type="button" class="alliance blue" data-alliance="blue" role="radio" aria-checked="false">Blue</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="phase">Auto</h2>
+      <div class="counters">
+        <div class="counter" data-key="autoShotsMade">
+          <div class="counter-label">Made</div>
+          <div class="counter-controls">
+            <button class="dec" aria-label="Decrement auto made">–</button>
+            <div class="counter-value">0</div>
+            <button class="inc" aria-label="Increment auto made">+</button>
+          </div>
+        </div>
+        <div class="counter" data-key="autoShotsMissed">
+          <div class="counter-label">Missed</div>
+          <div class="counter-controls">
+            <button class="dec" aria-label="Decrement auto missed">–</button>
+            <div class="counter-value">0</div>
+            <button class="inc" aria-label="Increment auto missed">+</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="phase">Teleop</h2>
+      <div class="counters">
+        <div class="counter" data-key="teleopShotsMade">
+          <div class="counter-label">Made</div>
+          <div class="counter-controls">
+            <button class="dec" aria-label="Decrement teleop made">–</button>
+            <div class="counter-value">0</div>
+            <button class="inc" aria-label="Increment teleop made">+</button>
+          </div>
+        </div>
+        <div class="counter" data-key="teleopShotsMissed">
+          <div class="counter-label">Missed</div>
+          <div class="counter-controls">
+            <button class="dec" aria-label="Decrement teleop missed">–</button>
+            <div class="counter-value">0</div>
+            <button class="inc" aria-label="Increment teleop missed">+</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <label class="field">
+        <span>Notes</span>
+        <textarea id="notes" rows="2" placeholder="Optional notes (defense, breakdown, etc.)"></textarea>
+      </label>
+    </section>
+
+    <section class="actions">
+      <button id="saveBtn" class="primary">Save Entry</button>
+      <button id="syncBtn" class="secondary">Sync</button>
+    </section>
+  </main>
+
+  <div id="settingsDialog" class="modal" hidden>
+    <div class="modal-card">
+      <h2>Settings</h2>
+      <label class="field">
+        <span>Apps Script URL</span>
+        <input id="endpointUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
+      </label>
+      <label class="field">
+        <span>Default Event Code</span>
+        <input id="defaultEvent" type="text" />
+      </label>
+      <label class="field">
+        <span>Device ID</span>
+        <input id="deviceIdInput" type="text" />
+      </label>
+      <label class="checkbox">
+        <input id="autoSyncToggle" type="checkbox" />
+        <span>Auto-sync when online</span>
+      </label>
+      <label class="checkbox">
+        <input id="autoIncrementToggle" type="checkbox" />
+        <span>Auto-increment match number after save</span>
+      </label>
+      <div class="modal-actions">
+        <button id="settingsCancel" class="secondary">Cancel</button>
+        <button id="settingsSave" class="primary">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

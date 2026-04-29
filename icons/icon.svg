@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="FTC Scouting">
+  <rect width="512" height="512" rx="96" fill="#0b1220"/>
+  <circle cx="256" cy="200" r="92" fill="none" stroke="#3b82f6" stroke-width="22"/>
+  <circle cx="256" cy="200" r="36" fill="#3b82f6"/>
+  <rect x="116" y="332" width="280" height="56" rx="14" fill="#ef4444"/>
+  <rect x="116" y="404" width="280" height="56" rx="14" fill="#3b82f6"/>
+  <text x="256" y="372" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700" fill="#fff">RED</text>
+  <text x="256" y="444" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700" fill="#fff">BLUE</text>
+</svg>
