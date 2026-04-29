@@ -11,8 +11,8 @@
   // Paste the Apps Script /exec URL here once and commit. All tablets that
   // load the hosted app will pick it up automatically. Per-tablet Settings
   // can still override; clearing the override falls back to this default.
-  const DEFAULT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxswZjTaTSFYGw971fFJ_mFmMuzdALdwDInD2rhe8WZ_WUuu6xR9oyeaGTB8zBfn1Ww/exec';
-
+  const DEFAULT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxELNskzlKQHC4bH386yyVbZQBKesZEarIXwFKEr-6QtEvnBG1UPJrNIQPypMOKagk/exec';
+  
   const COUNTER_KEYS = ['autoShotsMade', 'autoShotsMissed', 'teleopShotsMade', 'teleopShotsMissed'];
 
   // ---------- Settings & device id ----------
