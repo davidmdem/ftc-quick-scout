@@ -1,19 +1,21 @@
 :root {
-  --bg: #0b1220;
-  --surface: #131b2e;
-  --surface-2: #1b2540;
-  --border: #2a3658;
-  --text: #e6ecf5;
-  --muted: #9aa6c2;
-  --primary: #3b82f6;
-  --primary-press: #1d4ed8;
-  --secondary: #475569;
-  --success: #16a34a;
-  --danger: #dc2626;
+  /* Theme: cyan brand (#00BBD9), white surfaces, black ink. */
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f4f4f5;
+  --border: #e2e2e6;
+  --text: #000000;
+  --muted: #555555;
+  --primary: #00BBD9;
+  --primary-press: #0099B0;
+  --secondary: #1a1a1a;
+  /* Functional status colors — kept as semantic indicators. */
+  --success: #15803d;
+  --danger: #b91c1c;
   --red: #ef4444;
-  --blue: #3b82f6;
-  --warning: #f59e0b;
-  --shadow: 0 6px 24px rgba(0,0,0,0.35);
+  --blue: #00BBD9;
+  --warning: #b45309;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
 * { box-sizing: border-box; }
@@ -64,9 +66,9 @@ input, textarea {
   border: 1px solid var(--border);
   color: var(--muted);
 }
-.pill-net.online { background: rgba(22,163,74,0.15); color: #86efac; border-color: rgba(22,163,74,0.4); }
-.pill-net.offline { background: rgba(220,38,38,0.15); color: #fca5a5; border-color: rgba(220,38,38,0.4); }
-.pill-count.has { background: rgba(245,158,11,0.15); color: #fcd34d; border-color: rgba(245,158,11,0.4); }
+.pill-net.online { background: rgba(22,163,74,0.12); color: #15803d; border-color: rgba(22,163,74,0.4); }
+.pill-net.offline { background: rgba(220,38,38,0.10); color: #b91c1c; border-color: rgba(220,38,38,0.4); }
+.pill-count.has { background: rgba(245,158,11,0.15); color: #b45309; border-color: rgba(245,158,11,0.5); }
 .icon-btn {
   background: transparent;
   border: 1px solid var(--border);
@@ -153,8 +155,8 @@ input, textarea {
   font-weight: 700;
   cursor: pointer;
 }
-.alliance.red[aria-checked="true"] { background: var(--red); border-color: var(--red); color: white; }
-.alliance.blue[aria-checked="true"] { background: var(--blue); border-color: var(--blue); color: white; }
+.alliance.red[aria-checked="true"] { background: var(--red); border-color: var(--red); color: #fff; }
+.alliance.blue[aria-checked="true"] { background: var(--blue); border-color: var(--blue); color: #000; }
 
 .phase {
   margin: 0 0 10px;
@@ -194,12 +196,12 @@ input, textarea {
   border-radius: clamp(12px, 0.2vw + 10px, 16px);
   border: none;
   background: var(--primary);
-  color: white;
+  color: #000;
   font-size: clamp(1.6rem, 0.4vw + 1.45rem, 2.2rem);
   font-weight: 700;
   cursor: pointer;
 }
-.counter-controls .dec { background: var(--secondary); }
+.counter-controls .dec { background: var(--secondary); color: #fff; }
 .counter-controls button:active { transform: translateY(1px); }
 .counter-value {
   text-align: center;
@@ -227,11 +229,10 @@ input, textarea {
   font-size: clamp(1.15rem, 0.2vw + 1.05rem, 1.4rem);
   font-weight: 700;
   cursor: pointer;
-  color: white;
 }
-.primary { background: var(--primary); }
+.primary { background: var(--primary); color: #000; }
 .primary:active { background: var(--primary-press); }
-.secondary { background: var(--secondary); }
+.secondary { background: var(--secondary); color: #fff; }
 .secondary:disabled { opacity: 0.6; cursor: default; }
 
 .toast {
@@ -239,11 +240,11 @@ input, textarea {
   left: 50%;
   bottom: 96px;
   transform: translateX(-50%);
-  background: #0f172a;
-  color: white;
+  background: #000;
+  color: #fff;
   padding: 12px 18px;
   border-radius: 999px;
-  border: 1px solid var(--border);
+  border: 1px solid #000;
   box-shadow: var(--shadow);
   z-index: 20;
   animation: toast-in 200ms ease-out;
@@ -353,8 +354,8 @@ input, textarea {
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
-.entry-status.unsynced { background: rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.4); color: #fcd34d; }
-.entry-status.synced { background: rgba(22,163,74,0.15); border-color: rgba(22,163,74,0.4); color: #86efac; }
+.entry-status.unsynced { background: rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.5); color: #b45309; }
+.entry-status.synced { background: rgba(22,163,74,0.12); border-color: rgba(22,163,74,0.4); color: #15803d; }
 .entry-delete {
   align-self: center;
   height: 44px;
@@ -372,12 +373,12 @@ input, textarea {
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  background: rgba(245,158,11,0.12);
-  border: 1px solid rgba(245,158,11,0.4);
-  color: #fcd34d;
+  background: rgba(245,158,11,0.15);
+  border: 1px solid rgba(245,158,11,0.5);
+  color: #b45309;
   border-radius: 10px;
 }
-.edit-banner strong { color: #fff; }
+.edit-banner strong { color: #000; }
 
 /* Notes textarea grows fluidly with viewport so it isn't a tiny strip on tablets. */
 .area-notes textarea { min-height: clamp(60px, 4vw + 30px, 160px); }
