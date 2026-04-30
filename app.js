@@ -313,12 +313,12 @@
     });
     $('#matchNumber').addEventListener('input', (e) => {
       state.matchNumber = e.target.value;
-      if (editingId) renderEditBanner();
+      renderEditBanner();
       persistDraft();
     });
     $('#teamNumber').addEventListener('input', (e) => {
       state.teamNumber = e.target.value;
-      if (editingId) renderEditBanner();
+      renderEditBanner();
       persistDraft();
     });
     $('#notes').addEventListener('input', (e) => {
@@ -338,6 +338,7 @@
     renderCounters();
     renderAlliance();
     renderInputs();
+    renderEditBanner();
     persistDraft();
   }
 
@@ -467,20 +468,36 @@
     renderInputs();
     renderCounters();
     renderAlliance();
+    renderEditBanner();
     persistDraft();
   }
 
   function renderEditBanner() {
     const el = $('#editBanner');
     if (!el) return;
+    const label = $('.edit-label', el);
+    const target = $('.edit-target', el);
+    const cancelBtn = $('#cancelEditBtn');
+    if (!label || !target || !cancelBtn) return;
+
     if (editingId) {
+      label.textContent = 'Editing';
       const m = state.matchNumber || '?';
       const t = state.teamNumber || '?';
-      $('.edit-target', el).textContent = `Match ${m} · Team ${t}`;
-      el.hidden = false;
+      target.textContent = `Match ${m} · Team ${t}`;
+      cancelBtn.hidden = false;
     } else {
-      el.hidden = true;
+      label.textContent = 'New entry';
+      if (state.matchNumber || state.teamNumber) {
+        const m = state.matchNumber || '?';
+        const t = state.teamNumber || '?';
+        target.textContent = `Match ${m} · Team ${t}`;
+      } else {
+        target.textContent = '—';
+      }
+      cancelBtn.hidden = true;
     }
+    el.hidden = false;
   }
 
   // ---------- Entries screen ----------
