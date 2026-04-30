@@ -86,7 +86,6 @@ input, textarea {
   padding: clamp(12px, 0.5vw + 9px, 20px);
   max-width: 1700px;
   margin: 0 auto;
-  margin-bottom: clamp(120px, 2vw + 110px, 160px);
 }
 
 .card {
@@ -211,16 +210,10 @@ input, textarea {
 }
 
 .actions {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: clamp(10px, 0.4vw + 7px, 18px);
-  /* Backdrop stays full-bleed; horizontal padding grows on wide viewports
-     so the buttons stay centered within the 1700px content cap. */
-  padding: clamp(12px, 0.4vw + 9px, 18px) max(clamp(12px, 0.5vw + 9px, 20px), calc((100% - 1700px) / 2));
-  padding-bottom: max(clamp(12px, 0.4vw + 9px, 18px), env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, transparent, var(--bg) 30%);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 .primary, .secondary {
   height: clamp(64px, 1.2vw + 56px, 88px);
