@@ -41,14 +41,14 @@ input, textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: clamp(12px, 0.4vw + 10px, 18px) clamp(14px, 0.6vw + 10px, 22px);
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  padding-top: max(12px, env(safe-area-inset-top));
+  padding-top: max(clamp(12px, 0.4vw + 10px, 18px), env(safe-area-inset-top));
 }
 .brand {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: clamp(1.1rem, 0.15vw + 1.05rem, 1.3rem);
   letter-spacing: 0.4px;
 }
 .status {
@@ -72,25 +72,26 @@ input, textarea {
   border: 1px solid var(--border);
   color: var(--text);
   border-radius: 10px;
-  width: 40px;
-  height: 40px;
-  font-size: 1.2rem;
+  width: clamp(40px, 0.4vw + 37px, 48px);
+  height: clamp(40px, 0.4vw + 37px, 48px);
+  font-size: clamp(1.2rem, 0.1vw + 1.15rem, 1.35rem);
   cursor: pointer;
 }
 
 .container {
   display: grid;
-  gap: 12px;
-  padding: 12px;
-  max-width: 900px;
-  margin: 0 auto 120px;
+  gap: clamp(10px, 0.5vw + 8px, 20px);
+  padding: clamp(12px, 0.5vw + 9px, 20px);
+  max-width: 1700px;
+  margin: 0 auto;
+  margin-bottom: clamp(120px, 2vw + 110px, 160px);
 }
 
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px;
+  border-radius: clamp(14px, 0.2vw + 12px, 18px);
+  padding: clamp(14px, 0.4vw + 11px, 20px);
   box-shadow: var(--shadow);
 }
 
@@ -110,9 +111,9 @@ input, textarea {
   background: var(--surface-2);
   color: var(--text);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-size: 1.1rem;
+  border-radius: clamp(10px, 0.2vw + 8px, 14px);
+  padding: clamp(12px, 0.25vw + 10px, 16px) clamp(14px, 0.3vw + 12px, 18px);
+  font-size: clamp(1.1rem, 0.15vw + 1.05rem, 1.25rem);
   outline: none;
 }
 .field input:focus, .field textarea:focus { border-color: var(--primary); }
@@ -143,12 +144,12 @@ input, textarea {
   gap: 10px;
 }
 .alliance {
-  height: 56px;
-  border-radius: 12px;
+  height: clamp(56px, 1vw + 50px, 72px);
+  border-radius: clamp(12px, 0.2vw + 10px, 16px);
   border: 2px solid var(--border);
   background: var(--surface-2);
   color: var(--text);
-  font-size: 1.1rem;
+  font-size: clamp(1.1rem, 0.2vw + 1.05rem, 1.4rem);
   font-weight: 700;
   cursor: pointer;
 }
@@ -165,35 +166,36 @@ input, textarea {
 .counters {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: clamp(10px, 0.4vw + 7px, 18px);
 }
 .counter {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px;
+  border-radius: clamp(12px, 0.2vw + 10px, 16px);
+  padding: clamp(10px, 0.4vw + 7px, 18px);
 }
 .counter-label {
   text-align: center;
   color: var(--muted);
-  margin-bottom: 8px;
-  font-size: 0.9rem;
+  margin-bottom: clamp(8px, 0.2vw + 6px, 12px);
+  font-size: clamp(0.9rem, 0.1vw + 0.85rem, 1.05rem);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 .counter-controls {
   display: grid;
-  grid-template-columns: 64px 1fr 64px;
+  /* Buttons grow from 64px (mobile) up to 104px (XL tablet). */
+  grid-template-columns: clamp(64px, 3vw + 44px, 104px) 1fr clamp(64px, 3vw + 44px, 104px);
   align-items: center;
-  gap: 8px;
+  gap: clamp(8px, 0.4vw + 6px, 16px);
 }
 .counter-controls button {
-  height: 64px;
-  border-radius: 12px;
+  height: clamp(64px, 3vw + 44px, 104px);
+  border-radius: clamp(12px, 0.2vw + 10px, 16px);
   border: none;
   background: var(--primary);
   color: white;
-  font-size: 1.6rem;
+  font-size: clamp(1.6rem, 0.4vw + 1.45rem, 2.2rem);
   font-weight: 700;
   cursor: pointer;
 }
@@ -201,7 +203,7 @@ input, textarea {
 .counter-controls button:active { transform: translateY(1px); }
 .counter-value {
   text-align: center;
-  font-size: 2.2rem;
+  font-size: clamp(2.2rem, 0.6vw + 1.95rem, 3.2rem);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
@@ -211,16 +213,18 @@ input, textarea {
   left: 0; right: 0; bottom: 0;
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 10px;
-  padding: 12px;
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  gap: clamp(10px, 0.4vw + 7px, 18px);
+  /* Backdrop stays full-bleed; horizontal padding grows on wide viewports
+     so the buttons stay centered within the 1700px content cap. */
+  padding: clamp(12px, 0.4vw + 9px, 18px) max(clamp(12px, 0.5vw + 9px, 20px), calc((100% - 1700px) / 2));
+  padding-bottom: max(clamp(12px, 0.4vw + 9px, 18px), env(safe-area-inset-bottom));
   background: linear-gradient(180deg, transparent, var(--bg) 30%);
 }
 .primary, .secondary {
-  height: 64px;
-  border-radius: 14px;
+  height: clamp(64px, 1.2vw + 56px, 88px);
+  border-radius: clamp(14px, 0.2vw + 12px, 16px);
   border: none;
-  font-size: 1.15rem;
+  font-size: clamp(1.15rem, 0.2vw + 1.05rem, 1.4rem);
   font-weight: 700;
   cursor: pointer;
   color: white;
@@ -266,11 +270,11 @@ input, textarea {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 18px;
+  padding: clamp(18px, 0.5vw + 14px, 28px);
   width: 100%;
-  max-width: 520px;
+  max-width: min(720px, 92vw);
   display: grid;
-  gap: 12px;
+  gap: clamp(12px, 0.3vw + 10px, 18px);
 }
 .modal-card h2 { margin: 0; }
 .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
@@ -375,115 +379,18 @@ input, textarea {
 }
 .edit-banner strong { color: #fff; }
 
-/* Tablet landscape (≥900px): phase counters side-by-side */
-@media (min-width: 900px) {
-  .container {
-    max-width: 1100px;
-    grid-template-columns: 1fr 1fr;
-  }
+/* Notes textarea grows fluidly with viewport so it isn't a tiny strip on tablets. */
+.area-notes textarea { min-height: clamp(60px, 4vw + 30px, 160px); }
+
+/* Layout switch: side-by-side phase cards once there's room for two
+   comfortable columns. Below this, everything stacks. Sizing is fluid
+   via clamp() at all viewport widths — only the structural arrangement
+   changes here. */
+@media (min-width: 720px) {
+  .container { grid-template-columns: 1fr 1fr; }
   .area-banner { grid-column: 1 / -1; }
   .area-info   { grid-column: 1 / -1; }
   .area-auto   { grid-column: 1; }
   .area-teleop { grid-column: 2; }
   .area-notes  { grid-column: 1 / -1; }
-}
-
-/* Large tablet (target: 1279x800): bigger touch targets, wider container */
-@media (min-width: 1200px) {
-  .container {
-    max-width: 1240px;
-    gap: 16px;
-    padding: 16px;
-    margin-bottom: 140px;
-  }
-  .topbar { padding: 14px 20px; }
-  .brand { font-size: 1.25rem; }
-  .pill { font-size: 0.95rem; padding: 8px 12px; }
-  .icon-btn { width: 44px; height: 44px; font-size: 1.3rem; }
-
-  .card { padding: 18px; border-radius: 16px; }
-  .row { gap: 14px; }
-  .field input, .field textarea, .field select {
-    padding: 14px 16px;
-    font-size: 1.2rem;
-    border-radius: 12px;
-  }
-  .alliance { height: 64px; font-size: 1.25rem; border-radius: 14px; }
-  .phase { font-size: 1.05rem; margin-bottom: 14px; }
-
-  .counters { gap: 14px; }
-  .counter { padding: 14px; border-radius: 14px; }
-  .counter-label { font-size: 1rem; margin-bottom: 12px; }
-  .counter-controls {
-    grid-template-columns: 88px 1fr 88px;
-    gap: 14px;
-  }
-  .counter-controls button {
-    height: 88px;
-    font-size: 1.9rem;
-    border-radius: 14px;
-  }
-  .counter-value { font-size: 2.8rem; }
-
-  .area-notes textarea { min-height: 120px; }
-
-  /* Center fixed action bar contents within the content max-width while
-     keeping the gradient backdrop full-bleed. */
-  .actions {
-    grid-template-columns: 2fr 1fr;
-    gap: 14px;
-    padding: 14px max(16px, calc((100% - 1240px) / 2));
-    padding-bottom: max(14px, env(safe-area-inset-bottom));
-  }
-  .primary, .secondary {
-    height: 76px;
-    font-size: 1.3rem;
-    border-radius: 16px;
-  }
-
-  .modal-card { max-width: 600px; padding: 22px; }
-}
-
-/* XL tablet (target: 1920x1200): scale up further */
-@media (min-width: 1700px) {
-  html, body { font-size: 20px; }
-  .container {
-    max-width: 1700px;
-    gap: 20px;
-    padding: 20px;
-    margin-bottom: 160px;
-  }
-  .field input, .field textarea, .field select {
-    padding: 16px 18px;
-    font-size: 1.25rem;
-  }
-  .alliance { height: 72px; font-size: 1.4rem; }
-
-  .counters { gap: 18px; }
-  .counter { padding: 18px; }
-  .counter-label { font-size: 1.05rem; }
-  .counter-controls {
-    grid-template-columns: 104px 1fr 104px;
-    gap: 18px;
-  }
-  .counter-controls button {
-    height: 104px;
-    font-size: 2.2rem;
-    border-radius: 16px;
-  }
-  .counter-value { font-size: 3.2rem; }
-
-  .area-notes textarea { min-height: 160px; }
-
-  .actions {
-    gap: 18px;
-    padding: 16px max(20px, calc((100% - 1700px) / 2));
-    padding-bottom: max(16px, env(safe-area-inset-bottom));
-  }
-  .primary, .secondary {
-    height: 88px;
-    font-size: 1.4rem;
-  }
-
-  .modal-card { max-width: 720px; padding: 28px; }
 }
