@@ -7,6 +7,7 @@
   const SETTINGS_KEY = 'ftc-scouting:settings';
   const DEVICE_ID_KEY = 'ftc-scouting:deviceId';
   const SCOUT_NAME_KEY = 'ftc-scouting:scoutName';
+  const DRAFT_KEY = 'ftc-scouting:draft';
 
   // Paste the Apps Script /exec URL here once and commit. All tablets that
   // load the hosted app will pick it up automatically. Per-tablet Settings
@@ -239,6 +240,21 @@
     notes: '',
   };
 
+  // Draft persistence — survives accidental refresh while offline.
+  function persistDraft() {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ state, editingId }));
+    } catch {}
+  }
+  function loadDraft() {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
   function $(sel, root = document) { return root.querySelector(sel); }
   function $$(sel, root = document) { return Array.from(root.querySelectorAll(sel)); }
 
@@ -271,10 +287,12 @@
       $('.inc', el).addEventListener('click', () => {
         state[key] = (state[key] || 0) + 1;
         renderCounters();
+        persistDraft();
       });
       $('.dec', el).addEventListener('click', () => {
         state[key] = Math.max(0, (state[key] || 0) - 1);
         renderCounters();
+        persistDraft();
       });
     });
   }
@@ -283,6 +301,7 @@
       btn.addEventListener('click', () => {
         state.alliance = btn.dataset.alliance;
         renderAlliance();
+        persistDraft();
       });
     });
   }
@@ -290,16 +309,22 @@
     $('#scoutName').addEventListener('input', (e) => {
       state.scoutName = e.target.value;
       setScoutName(state.scoutName.trim());
+      persistDraft();
     });
     $('#matchNumber').addEventListener('input', (e) => {
       state.matchNumber = e.target.value;
       if (editingId) renderEditBanner();
+      persistDraft();
     });
     $('#teamNumber').addEventListener('input', (e) => {
       state.teamNumber = e.target.value;
       if (editingId) renderEditBanner();
+      persistDraft();
     });
-    $('#notes').addEventListener('input', (e) => state.notes = e.target.value);
+    $('#notes').addEventListener('input', (e) => {
+      state.notes = e.target.value;
+      persistDraft();
+    });
   }
 
   function resetForNextMatch() {
@@ -313,6 +338,7 @@
     renderCounters();
     renderAlliance();
     renderInputs();
+    persistDraft();
   }
 
   function validate() {
@@ -420,6 +446,7 @@
     renderAlliance();
     renderEditBanner();
     $('#saveBtn').textContent = 'Update Entry';
+    persistDraft();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -427,6 +454,7 @@
     editingId = null;
     $('#saveBtn').textContent = 'Save Entry';
     renderEditBanner();
+    persistDraft();
   }
 
   function cancelEdit() {
@@ -439,6 +467,7 @@
     renderInputs();
     renderCounters();
     renderAlliance();
+    persistDraft();
   }
 
   function renderEditBanner() {
@@ -652,14 +681,28 @@
 
     const settings = loadSettings();
     state.scoutName = getScoutName();
+
+    // Recover form contents from a prior session (e.g. accidental refresh while offline).
+    const draft = loadDraft();
+    if (draft && draft.state) {
+      Object.assign(state, draft.state);
+      if (draft.editingId) {
+        editingId = draft.editingId;
+        $('#saveBtn').textContent = 'Update Entry';
+      }
+    }
+
     renderInputs();
     renderEventLabel();
     renderCounters();
     renderAlliance();
+    renderEditBanner();
     renderNetStatus();
     await refreshUnsyncedBadge();
 
-    if (settings.autoSync && navigator.onLine && settings.endpointUrl) {
+    // Skip auto-sync when restoring an in-progress edit so the entry isn't synced
+    // mid-edit (which would block the upcoming Update because it'd be marked synced).
+    if (!editingId && settings.autoSync && navigator.onLine && settings.endpointUrl) {
       syncAll({ silent: true });
     }
 
