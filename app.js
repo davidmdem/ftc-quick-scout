@@ -13,7 +13,9 @@
   // load the hosted app will pick it up automatically. Per-tablet Settings
   // can still override; clearing the override falls back to this default.
   const DEFAULT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxELNskzlKQHC4bH386yyVbZQBKesZEarIXwFKEr-6QtEvnBG1UPJrNIQPypMOKagk/exec';
-  
+
+  const SCHEDULE_URL = './2025-FTCCMP1EDIS-schedule.json';
+
   const COUNTER_KEYS = ['autoShotsMade', 'autoShotsMissed', 'teleopShotsMade', 'teleopShotsMissed'];
 
   // ---------- Settings & device id ----------
@@ -23,6 +25,7 @@
       defaultEvent: 'FTCCMP1',
       autoSync: true,
       autoIncrement: false,
+      station: '', // 'Red1' | 'Red2' | 'Blue1' | 'Blue2' | ''
     };
     try {
       const raw = localStorage.getItem(SETTINGS_KEY);
@@ -226,6 +229,96 @@
     return { sent, failed };
   }
 
+  // ---------- Schedule (event-day match list) ----------
+  // Sorted by startTime ascending once loaded. Empty until loadSchedule resolves.
+  let schedule = [];
+
+  async function loadSchedule() {
+    try {
+      const res = await fetch(SCHEDULE_URL);
+      if (!res.ok) return;
+      const data = await res.json();
+      const list = Array.isArray(data && data.schedule) ? data.schedule : [];
+      schedule = list.slice().sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+    } catch (e) {
+      console.warn('Schedule load failed', e);
+    }
+  }
+
+  function findMatch(matchNumber) {
+    const n = parseInt(matchNumber, 10);
+    if (!Number.isFinite(n)) return null;
+    return schedule.find((m) => m.matchNumber === n) || null;
+  }
+
+  // Pick the scheduled match whose startTime is closest to `now` — works as a
+  // sensible default whether we're a few minutes before or after the slot.
+  function activeMatchByTime(now = new Date()) {
+    if (!schedule.length) return null;
+    let best = null;
+    let bestDiff = Infinity;
+    for (const m of schedule) {
+      const diff = Math.abs(new Date(m.startTime).getTime() - now.getTime());
+      if (diff < bestDiff) { best = m; bestDiff = diff; }
+    }
+    return best;
+  }
+
+  function teamAt(match, station) {
+    if (!match || !station) return null;
+    return match.teams.find((t) => t.station === station) || null;
+  }
+
+  function allianceFromStation(station) {
+    if (!station) return null;
+    if (station.indexOf('Red') === 0) return 'red';
+    if (station.indexOf('Blue') === 0) return 'blue';
+    return null;
+  }
+
+  function stationLabel(station) {
+    switch (station) {
+      case 'Red1': return 'Red 1';
+      case 'Red2': return 'Red 2';
+      case 'Blue1': return 'Blue 1';
+      case 'Blue2': return 'Blue 2';
+      default: return '';
+    }
+  }
+
+  // Fill state.teamNumber + state.alliance from the schedule for the current
+  // matchNumber and configured station. Returns true if anything was applied.
+  function applyScheduleToCurrent() {
+    const settings = loadSettings();
+    if (!settings.station) return false;
+    const match = findMatch(state.matchNumber);
+    if (!match) return false;
+    const team = teamAt(match, settings.station);
+    if (!team) return false;
+    state.teamNumber = String(team.teamNumber);
+    state.alliance = allianceFromStation(settings.station);
+    return true;
+  }
+
+  function formatMatchTime(iso) {
+    try {
+      return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    } catch {
+      return '';
+    }
+  }
+
+  // Schedule + station + a known team for that match means team# and alliance
+  // are determined by the schedule — lock them so scouts can't accidentally
+  // type a wrong team or pick the wrong alliance.
+  function isLockedByStation() {
+    const settings = loadSettings();
+    if (!settings.station) return false;
+    const match = findMatch(state.matchNumber);
+    if (!match) return false;
+    return !!teamAt(match, settings.station);
+  }
+
   // ---------- UI state ----------
   let editingId = null;
   const state = {
@@ -279,6 +372,51 @@
   function renderEventLabel() {
     const s = loadSettings();
     $('#eventLabel').textContent = s.defaultEvent || '(set in settings)';
+    $('#stationLabel').textContent = stationLabel(s.station) || '(none)';
+  }
+
+  function renderMatchInfo() {
+    const el = $('#matchInfo');
+    if (!el) return;
+    const settings = loadSettings();
+    const match = findMatch(state.matchNumber);
+    if (!settings.station || !match) {
+      el.hidden = true;
+      el.className = 'match-info';
+      el.textContent = '';
+      applyLocks();
+      return;
+    }
+    const team = teamAt(match, settings.station);
+    const alliance = allianceFromStation(settings.station);
+    el.className = `match-info ${alliance || ''}`;
+    el.hidden = false;
+    const time = formatMatchTime(match.startTime);
+    if (!team) {
+      el.textContent = `Q${match.matchNumber} · ${stationLabel(settings.station)} · — · ${time}`;
+      applyLocks();
+      return;
+    }
+    const flags = [];
+    if (team.noShow) flags.push('no show');
+    if (team.surrogate) flags.push('surrogate');
+    const flagText = flags.length ? ` · ${flags.join(', ')}` : '';
+    const name = (team.teamName || '').trim();
+    el.textContent = `Q${match.matchNumber} · ${stationLabel(settings.station)} · ${name} (#${team.teamNumber}) · ${time}${flagText}`;
+    applyLocks();
+  }
+
+  function applyLocks() {
+    const locked = isLockedByStation();
+    const teamInput = $('#teamNumber');
+    if (teamInput) {
+      teamInput.readOnly = locked;
+      teamInput.classList.toggle('locked', locked);
+    }
+    $$('.alliance').forEach((btn) => {
+      btn.disabled = locked;
+      btn.classList.toggle('locked', locked);
+    });
   }
 
   function bindCounters() {
@@ -314,7 +452,18 @@
     $('#matchNumber').addEventListener('input', (e) => {
       state.matchNumber = e.target.value;
       renderEditBanner();
+      renderMatchInfo();
       persistDraft();
+    });
+    // Auto-fill team/alliance from schedule once the match # is committed
+    // (blur/Enter) — avoids overwriting on every keystroke as they type.
+    $('#matchNumber').addEventListener('change', () => {
+      if (applyScheduleToCurrent()) {
+        renderInputs();
+        renderAlliance();
+        renderMatchInfo();
+        persistDraft();
+      }
     });
     $('#teamNumber').addEventListener('input', (e) => {
       state.teamNumber = e.target.value;
@@ -335,10 +484,14 @@
     state.alliance = null;
     state.notes = '';
     for (const k of COUNTER_KEYS) state[k] = 0;
+    // After bumping the match #, re-fill team/alliance from the schedule so
+    // the next match is mostly pre-populated.
+    applyScheduleToCurrent();
     renderCounters();
     renderAlliance();
     renderInputs();
     renderEditBanner();
+    renderMatchInfo();
     persistDraft();
   }
 
@@ -446,6 +599,7 @@
     renderCounters();
     renderAlliance();
     renderEditBanner();
+    renderMatchInfo();
     $('#saveBtn').textContent = 'Update Entry';
     persistDraft();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -469,6 +623,7 @@
     renderCounters();
     renderAlliance();
     renderEditBanner();
+    renderMatchInfo();
     persistDraft();
   }
 
@@ -614,6 +769,90 @@
     $('#entriesScreen').hidden = true;
   }
 
+  // ---------- Schedule screen ----------
+  function makeScheduleTeamSpan(team, userStation) {
+    const span = document.createElement('span');
+    span.className = 'schedule-team';
+    if (!team) {
+      span.textContent = '—';
+      return span;
+    }
+    if (team.station === userStation) span.classList.add('me');
+    if (team.noShow) span.classList.add('noshow');
+    if (team.surrogate) span.classList.add('surrogate');
+    const name = (team.teamName || '').trim();
+    span.textContent = name ? `${team.displayTeamNumber} ${name}` : String(team.displayTeamNumber);
+    return span;
+  }
+
+  function renderScheduleRow(match, now) {
+    const settings = loadSettings();
+    const userStation = settings.station;
+    const userAlliance = userStation ? allianceFromStation(userStation) : null;
+    const userOnThisMatch = !!(userStation && teamAt(match, userStation));
+    const isPast = new Date(match.startTime).getTime() < now.getTime();
+
+    const row = document.createElement('div');
+    row.className = 'schedule-row';
+    if (isPast) row.classList.add('past');
+    if (userOnThisMatch && userAlliance) row.classList.add(userAlliance);
+
+    const header = document.createElement('div');
+    header.className = 'schedule-header';
+    const title = document.createElement('span');
+    title.className = 'schedule-title';
+    title.textContent = `Q${match.matchNumber}`;
+    const meta = document.createElement('span');
+    meta.className = 'schedule-meta';
+    meta.textContent = `${formatMatchTime(match.startTime)} · F${match.field}`;
+    header.appendChild(title);
+    header.appendChild(meta);
+
+    const red = document.createElement('div');
+    red.className = 'schedule-alliance schedule-red';
+    red.appendChild(makeScheduleTeamSpan(match.teams.find((t) => t.station === 'Red1'), userStation));
+    red.appendChild(makeScheduleTeamSpan(match.teams.find((t) => t.station === 'Red2'), userStation));
+
+    const blue = document.createElement('div');
+    blue.className = 'schedule-alliance schedule-blue';
+    blue.appendChild(makeScheduleTeamSpan(match.teams.find((t) => t.station === 'Blue1'), userStation));
+    blue.appendChild(makeScheduleTeamSpan(match.teams.find((t) => t.station === 'Blue2'), userStation));
+
+    row.appendChild(header);
+    row.appendChild(red);
+    row.appendChild(blue);
+    return row;
+  }
+
+  function openScheduleScreen() {
+    const screen = $('#scheduleScreen');
+    const list = $('#scheduleList');
+    screen.hidden = false;
+    list.innerHTML = '';
+    if (!schedule.length) {
+      const empty = document.createElement('div');
+      empty.className = 'entries-empty';
+      empty.textContent = 'No schedule available.';
+      list.appendChild(empty);
+      return;
+    }
+    const now = new Date();
+    let firstUpcoming = null;
+    for (const m of schedule) {
+      const row = renderScheduleRow(m, now);
+      if (!firstUpcoming && !row.classList.contains('past')) firstUpcoming = row;
+      list.appendChild(row);
+    }
+    // Jump to the next-up match so scouts don't have to scroll past the past ones.
+    if (firstUpcoming) {
+      requestAnimationFrame(() => firstUpcoming.scrollIntoView({ block: 'start' }));
+    }
+  }
+
+  function closeScheduleScreen() {
+    $('#scheduleScreen').hidden = true;
+  }
+
   // ---------- Toast / status ----------
   let toastTimer = null;
   function toast(msg, kind = '') {
@@ -653,6 +892,7 @@
     const s = loadSettings();
     $('#endpointUrl').value = s.endpointUrl || '';
     $('#defaultEvent').value = s.defaultEvent || '';
+    $('#stationSelect').value = s.station || '';
     $('#deviceIdInput').value = getDeviceId();
     $('#autoSyncToggle').checked = !!s.autoSync;
     $('#autoIncrementToggle').checked = !!s.autoIncrement;
@@ -663,12 +903,20 @@
     const s = loadSettings();
     s.endpointUrl = $('#endpointUrl').value.trim();
     s.defaultEvent = $('#defaultEvent').value.trim();
+    s.station = $('#stationSelect').value;
     s.autoSync = $('#autoSyncToggle').checked;
     s.autoIncrement = $('#autoIncrementToggle').checked;
     saveSettings(s);
     const newDev = $('#deviceIdInput').value.trim();
     if (newDev) localStorage.setItem(DEVICE_ID_KEY, newDev);
+    // Picking/changing the station may change which team/alliance applies
+    // to the current match — re-derive immediately so the form reflects it.
+    if (applyScheduleToCurrent()) {
+      renderInputs();
+      renderAlliance();
+    }
     renderEventLabel();
+    renderMatchInfo();
     closeSettings();
     toast('Settings saved', 'success');
   }
@@ -687,6 +935,8 @@
     $('#settingsSave').addEventListener('click', saveSettingsFromDialog);
     $('#entriesBtn').addEventListener('click', openEntriesScreen);
     $('#entriesClose').addEventListener('click', closeEntriesScreen);
+    $('#scheduleBtn').addEventListener('click', openScheduleScreen);
+    $('#scheduleClose').addEventListener('click', closeScheduleScreen);
     $('#cancelEditBtn').addEventListener('click', cancelEdit);
 
     window.addEventListener('online', () => {
@@ -709,11 +959,28 @@
       }
     }
 
+    // Schedule is fetched in parallel with the rest of init; auto-fill below
+    // depends on it so we await before deriving the active match.
+    await loadSchedule();
+
+    // Time-based prefill: when a station is configured and there's no
+    // in-progress draft/edit, pick the match closest to "now" and derive
+    // the team + alliance for the tablet's station.
+    if (!editingId && !state.matchNumber && schedule.length && settings.station) {
+      const m = activeMatchByTime();
+      if (m) {
+        state.matchNumber = String(m.matchNumber);
+        applyScheduleToCurrent();
+        persistDraft();
+      }
+    }
+
     renderInputs();
     renderEventLabel();
     renderCounters();
     renderAlliance();
     renderEditBanner();
+    renderMatchInfo();
     renderNetStatus();
     await refreshUnsyncedBadge();
 

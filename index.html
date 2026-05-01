@@ -16,6 +16,7 @@
     <div class="status">
       <span id="netStatus" class="pill pill-net">offline</span>
       <span id="unsyncedCount" class="pill pill-count">0 unsynced</span>
+      <button id="scheduleBtn" class="icon-btn" aria-label="Schedule">📅</button>
       <button id="entriesBtn" class="icon-btn" aria-label="Entries">☰</button>
       <button id="settingsBtn" class="icon-btn" aria-label="Settings">⚙︎</button>
     </div>
@@ -41,8 +42,11 @@
           <input id="teamNumber" type="number" inputmode="numeric" min="1" step="1" />
         </label>
       </div>
+      <div id="matchInfo" class="match-info" hidden></div>
+
       <div class="event-banner">
         Event: <strong id="eventLabel">—</strong>
+        · Station: <strong id="stationLabel">—</strong>
         <button type="button" id="eventSettingsBtn" class="link-btn">change</button>
       </div>
 
@@ -121,6 +125,18 @@
     </div>
   </div>
 
+  <div id="scheduleScreen" class="modal modal-full" hidden>
+    <div class="modal-card modal-card-full">
+      <header class="modal-header">
+        <button id="scheduleClose" class="icon-btn" aria-label="Close">✕</button>
+        <h2>Schedule</h2>
+      </header>
+      <div id="scheduleList" class="entries-list">
+        <div class="entries-empty">Loading…</div>
+      </div>
+    </div>
+  </div>
+
   <div id="settingsDialog" class="modal" hidden>
     <div class="modal-card">
       <h2>Settings</h2>
@@ -131,6 +147,16 @@
       <label class="field">
         <span>Default Event Code</span>
         <input id="defaultEvent" type="text" />
+      </label>
+      <label class="field">
+        <span>This tablet's station</span>
+        <select id="stationSelect">
+          <option value="">— none —</option>
+          <option value="Red1">Red 1</option>
+          <option value="Red2">Red 2</option>
+          <option value="Blue1">Blue 1</option>
+          <option value="Blue2">Blue 2</option>
+        </select>
       </label>
       <label class="field">
         <span>Device ID</span>

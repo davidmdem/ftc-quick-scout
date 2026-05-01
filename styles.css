@@ -129,6 +129,35 @@ input, textarea {
   outline: none;
 }
 .field input:focus, .field textarea:focus { border-color: var(--primary); }
+/* Locked when the schedule + station fully determine the value — scouts
+   shouldn't be able to overwrite the auto-filled team #. */
+.field input.locked,
+.field input[readonly] {
+  background: rgba(0,0,0,0.04);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.match-info {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-left-width: 6px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.match-info[hidden] { display: none; }
+.match-info.red {
+  border-left-color: var(--red);
+  background: rgba(239,68,68,0.08);
+}
+.match-info.blue {
+  border-left-color: var(--blue);
+  background: rgba(0,187,217,0.08);
+}
 
 .event-banner {
   margin-top: 10px;
@@ -167,6 +196,10 @@ input, textarea {
 }
 .alliance.red[aria-checked="true"] { background: var(--red); border-color: var(--red); color: #fff; }
 .alliance.blue[aria-checked="true"] { background: var(--blue); border-color: var(--blue); color: #000; }
+/* Disabled-via-station: keep the chosen side fully colored so it still
+   reads as the current alliance, dim the other so it looks non-tappable. */
+.alliance:disabled { cursor: not-allowed; }
+.alliance.locked[aria-checked="false"] { opacity: 0.35; }
 
 .phase {
   margin: 0 0 10px;
@@ -376,6 +409,48 @@ input, textarea {
   border-radius: 10px;
   cursor: pointer;
   font-size: 1.1rem;
+}
+
+.schedule-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 6px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: grid;
+  gap: 6px;
+}
+.schedule-row.red { border-left-color: var(--red); }
+.schedule-row.blue { border-left-color: var(--blue); }
+.schedule-row.past { opacity: 0.45; }
+.schedule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.schedule-title { font-size: 1.05rem; font-weight: 700; }
+.schedule-meta { font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.schedule-alliance {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+}
+.schedule-red .schedule-team { color: var(--red); }
+.schedule-blue .schedule-team { color: #0099B0; }
+.schedule-team {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.schedule-team.me { font-weight: 800; text-decoration: underline; }
+.schedule-team.noshow { text-decoration: line-through; opacity: 0.7; }
+.schedule-team.surrogate::after {
+  content: ' (s)';
+  color: var(--muted);
+  font-weight: 400;
 }
 
 .edit-banner {
