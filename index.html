@@ -141,14 +141,6 @@
     <div class="modal-card">
       <h2>Settings</h2>
       <label class="field">
-        <span>Apps Script URL</span>
-        <input id="endpointUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" />
-      </label>
-      <label class="field">
-        <span>Default Event Code</span>
-        <input id="defaultEvent" type="text" />
-      </label>
-      <label class="field">
         <span>This tablet's station</span>
         <select id="stationSelect">
           <option value="">— none —</option>
@@ -159,8 +151,16 @@
         </select>
       </label>
       <label class="field">
+        <span>Apps Script URL</span>
+        <input id="endpointUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" readonly />
+      </label>
+      <label class="field">
+        <span>Default Event Code</span>
+        <input id="defaultEvent" type="text" readonly />
+      </label>
+      <label class="field">
         <span>Device ID</span>
-        <input id="deviceIdInput" type="text" />
+        <input id="deviceIdInput" type="text" readonly />
       </label>
       <label class="checkbox">
         <input id="autoSyncToggle" type="checkbox" />
