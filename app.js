@@ -12,9 +12,15 @@
   // Paste the Apps Script /exec URL here once and commit. All tablets that
   // load the hosted app will pick it up automatically. Per-tablet Settings
   // can still override; clearing the override falls back to this default.
-  const DEFAULT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxELNskzlKQHC4bH386yyVbZQBKesZEarIXwFKEr-6QtEvnBG1UPJrNIQPypMOKagk/exec';
+  const DEFAULT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwL1XiNvcRg9z8YIwNUi4lFYRl4rXdahtOcKGeHaOMgUwy-59Z50RU7eFo9-Vjvbqc-/exec';
 
-  const SCHEDULE_URL = './2025-FTCCMP1EDIS-schedule.json';
+  // Bump this whenever the event changes. migrateSettings() uses it to detect
+  // tablets carrying a previous event's saved endpoint/eventCode and reset them
+  // to the compiled defaults below, so a code+redeploy is enough to repoint every
+  // tablet (no per-device cleanup).
+  const EVENT_CONFIG_ID = 'FPEMICRFT';
+
+  const SCHEDULE_URL = './FPEMICRFT-schedule.json';
 
   const COUNTER_KEYS = ['autoShotsMade', 'autoShotsMissed', 'teleopShotsMade', 'teleopShotsMissed'];
 
@@ -22,10 +28,11 @@
   function loadSettings() {
     const defaults = {
       endpointUrl: DEFAULT_ENDPOINT,
-      defaultEvent: 'FTCCMP1',
+      defaultEvent: 'FPEMICRFT',
       autoSync: true,
       autoIncrement: false,
       station: '', // 'Red1' | 'Red2' | 'Blue1' | 'Blue2' | ''
+      eventConfigId: EVENT_CONFIG_ID,
     };
     try {
       const raw = localStorage.getItem(SETTINGS_KEY);
@@ -40,6 +47,29 @@
   }
   function saveSettings(s) {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+  }
+  // One-time, idempotent reset for tablets carrying a previous event's saved
+  // settings. Without this, loadSettings() would keep merging the old stored
+  // endpointUrl/defaultEvent over the new compiled defaults, so the tablet would
+  // silently keep syncing to the old sheet. Station and other prefs are kept —
+  // tablets stay where they're physically placed.
+  function migrateSettings() {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return; // fresh tablet: defaults already correct.
+    let stored;
+    try {
+      stored = JSON.parse(raw);
+    } catch {
+      return;
+    }
+    if (stored && stored.eventConfigId === EVENT_CONFIG_ID) return; // already migrated.
+    const migrated = {
+      ...stored,
+      endpointUrl: DEFAULT_ENDPOINT,
+      defaultEvent: 'FPEMICRFT',
+      eventConfigId: EVENT_CONFIG_ID,
+    };
+    saveSettings(migrated);
   }
   function getDeviceId() {
     let id = localStorage.getItem(DEVICE_ID_KEY);
@@ -923,6 +953,10 @@
 
   // ---------- Init ----------
   async function init() {
+    // Repoint any tablet still carrying a previous event's saved settings before
+    // anything reads them. Idempotent: no-op once a tablet is on this event.
+    migrateSettings();
+
     bindCounters();
     bindAlliance();
     bindInputs();
