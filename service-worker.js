@@ -1,6 +1,6 @@
 // Cache-first service worker for the app shell.
 // Bump CACHE_VERSION whenever shell assets change to force a refresh.
-const CACHE_VERSION = 'v4.7';
+const CACHE_VERSION = 'v4.8';
 const CACHE_NAME = `ftc-scouting-${CACHE_VERSION}`;
 
 const APP_SHELL = [
